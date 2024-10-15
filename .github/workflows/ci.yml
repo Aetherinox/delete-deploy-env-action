@@ -86,6 +86,8 @@ jobs:
 
             - name: Test
               run: npm run test
+              env:
+                  GITHUB_TOKEN: ${{ secrets.SELF_TOKEN_CL }}
 
             - name: Create GitHub deployment
               uses: chrnorm/deployment-action@v2
