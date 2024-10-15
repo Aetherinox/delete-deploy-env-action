@@ -125,7 +125,7 @@ test.beforeEach((t) =>
     process.env.INPUT_TOKEN = process.env.GITHUB_TOKEN;
 });
 
-test.serial('should successfully remove environment', async (t) =>
+test.serial(' Should successfully remove environment', async (t) =>
 {
     t.timeout(60000);
 
@@ -171,7 +171,7 @@ test.serial('should successfully remove environment', async (t) =>
     t.falsy(environmentExists);
 });
 
-test.serial('should successfully remove deployments when environment has not been created',
+test.serial(' Should successfully remove deployments when environment has not been created',
     async (t) =>
     {
         const { octokit, repo, ref } = t.context;
@@ -204,7 +204,7 @@ test.serial('should successfully remove deployments when environment has not bee
     },
 );
 
-test.serial('should successfully remove deployments and not remove environment',
+test.serial(' Should successfully remove deployments and not remove environment',
     async (t) =>
     {
 
@@ -246,7 +246,7 @@ test.serial('should successfully remove deployments and not remove environment',
     },
 );
 
-test.serial( 'should successfully remove deployment ref only and not remove environment',
+test.serial( ' Successfully remove deployment ref only and not remove environment',
     async (t) =>
     {
         const environment = 'test-remove-deployment-ref-only';
