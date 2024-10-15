@@ -256,6 +256,161 @@ jobs:
           onlyDeactivateDeployments: true
 ```
 
+<br />
+
+### Avoid Secondary Rate Limiting
+No more than 100 concurrent requests are allowed. and mo more than 900 points per minute are allowed for REST API endpoints. This limit is shared across the Github REST API and GraphQL API. To handle this rate limiting issue, we've implemented a delay that be specified within your workflow. In the example below, we add the property `delay`, and set it to `500 milliseconds`.  This means that if you have a large number of deployments you wish to erase, it will take longer than a minute, but you can easily walk away and the workflow will complete successfully without throwing a **Secondary rate limit** error.
+
+```yml
+jobs:
+    cleanup:
+        runs-on: ubuntu-latest
+        permissions: write-all
+
+        steps:
+            - name: >-
+                ⚙️ Deployments › Clean
+              uses: Aetherinox/delete-deploy-env-action@v3.0.0
+              with:
+                  token: ${{ secrets.SELF_TOKEN_CL }}
+                  environment: orion
+                  onlyRemoveDeployments: true
+                  delay: "500"
+```
+
+<br />
+
+---
+
+<br />
+
+## Rate Limits
+Remember that Github has implemented rate limits on how many actions you can perform. If you would like to see your current limits, open up a Command Prompt / Terminal, and run the following CURL command. Replace `<YOUR-TOKEN>` with your Github API token.
+
+```
+curl -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer <YOUR-TOKEN>" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/rate_limit
+```
+
+<br />
+
+You should see the following:
+```json
+{
+  "resources": {
+    "core": {
+      "limit": 10000,
+      "used": 27,
+      "remaining": 9973,
+      "reset": 1729024173
+    },
+    "search": {
+      "limit": 30,
+      "used": 0,
+      "remaining": 30,
+      "reset": 1729020821
+    },
+    "graphql": {
+      "limit": 5000,
+      "used": 1,
+      "remaining": 4999,
+      "reset": 1729022213
+    },
+    "integration_manifest": {
+      "limit": 5000,
+      "used": 0,
+      "remaining": 5000,
+      "reset": 1729024361
+    },
+    "source_import": {
+      "limit": 100,
+      "used": 0,
+      "remaining": 100,
+      "reset": 1729020821
+    },
+    "code_scanning_upload": {
+      "limit": 1000,
+      "used": 0,
+      "remaining": 1000,
+      "reset": 1729024361
+    },
+    "actions_runner_registration": {
+      "limit": 10000,
+      "used": 0,
+      "remaining": 10000,
+      "reset": 1729024361
+    },
+    "scim": {
+      "limit": 15000,
+      "used": 0,
+      "remaining": 15000,
+      "reset": 1729024361
+    },
+    "dependency_snapshots": {
+      "limit": 100,
+      "used": 0,
+      "remaining": 100,
+      "reset": 1729020821
+    },
+    "audit_log": {
+      "limit": 1750,
+      "used": 0,
+      "remaining": 1750,
+      "reset": 1729024361
+    },
+    "audit_log_streaming": {
+      "limit": 15,
+      "used": 0,
+      "remaining": 15,
+      "reset": 1729024361
+    },
+    "code_search": {
+      "limit": 10,
+      "used": 0,
+      "remaining": 10,
+      "reset": 1729020821
+    }
+  },
+  "rate": {
+    "limit": 10000,
+    "used": 27,
+    "remaining": 9973,
+    "reset": 1729024173
+  }
+}
+```
+
+<br />
+
+To see your rate limit for mangaging your repo environment and deleting deployments with tools such as this Github action, view the `core` object.
+
+<br />
+
+> [!NOTE]
+> The `rate` object is deprecated. If you're writing new API client code or updating existing code, you should use the `core` object instead of the rate object. The `core` object contains the same information that is present in the rate object.
+
+<br />
+
+You may also see your rate limit by accessing the Github REST API and calling the headers for your repo. Replace `<YOUR-TOKEN>` with your Github API token:
+
+```shell
+curl -I -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer <YOUR-TOKEN>" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/OWNER/REPO/environments/ENVIRONMENT_NAME
+```
+
+<br />
+
+You will see:
+```console
+x-github-api-version-selected: 2022-11-28
+X-RateLimit-Limit: 10000
+X-RateLimit-Remaining: 9967
+X-RateLimit-Reset: 1729024173
+X-RateLimit-Used: 33
+X-RateLimit-Resource: core
+```
+
+<br />
+
+
 
 <br />
 
