@@ -97,7 +97,7 @@ jobs:
             - name: "👁️‍🗨️ Package Version › Get"
               id: task_npmtest_package_version
               run: |
-                  VER=$(cat src/package.json | jq -r '.version')
+                  VER=$(cat package.json | jq -r '.version')
                   echo "PACKAGE_VERSION=$VER" >> $GITHUB_OUTPUT
 
             # #
