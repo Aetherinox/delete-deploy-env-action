@@ -64,6 +64,17 @@ jobs:
                   registry-url: https://npm.pkg.github.com/
                   scope: '@aetherinox'
 
+            # #
+            #   [ Daily Reset ] Node - Install
+            # #
+
+            - name: "📦 NPM › Install"
+              id: task_cloudflare_npm_install
+              run: |
+                  npm install
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.SELF_TOKEN_CL }}
+
             - name: Install dependencies
               run: npm ci
 
