@@ -68,11 +68,11 @@ Stuff happens, and sometimes as best as we try, there may be issues within this 
 
 <br />
 
-If you have found a bug, have an issue, or maybe even a cool idea; you can let us know by [submitting it](https://github.com/aetherinox/obsidian-gistr/issues). However, before you submit your new issue, bug report, or feature request; head over to the [Issues Section](https://github.com/aetherinox/obsidian-gistr/issues) and ensure nobody else has already submitted it.
+If you have found a bug, have an issue, or maybe even a cool idea; you can let us know by [submitting it](https://github.com/aetherinox/delete-deploy-env-action/issues). However, before you submit your new issue, bug report, or feature request; head over to the [Issues Section](https://github.com/aetherinox/delete-deploy-env-action/issues) and ensure nobody else has already submitted it.
 
 <br />
 
-Once you are sure that your issue has not already being dealt with; you may submit a new issue at [here](https://github.com/aetherinox/obsidian-gistr/issues/new/choose). You'll be asked to specify exactly what your new submission targets, such as:
+Once you are sure that your issue has not already being dealt with; you may submit a new issue at [here](https://github.com/aetherinox/delete-deploy-env-action/issues/new/choose). You'll be asked to specify exactly what your new submission targets, such as:
 - Bug report
 - Feature Suggestion
 
@@ -338,20 +338,20 @@ Pick the config file below depending on which version of ESLint you are using. T
 <br />
 
 ##### ESLint >= v9 Config
-- [eslint.config.mjs](https://github.com/aetherinox/obsidian-gistr/blob/main/eslint.config.mjs)
-- [eslint.config.js](https://github.com/aetherinox/obsidian-gistr/blob/main/eslint.config.js)
+- [eslint.config.mjs](https://github.com/aetherinox/delete-deploy-env-action/blob/main/eslint.config.mjs)
+- [eslint.config.js](https://github.com/aetherinox/delete-deploy-env-action/blob/main/eslint.config.js)
 
     https://github.com/Aetherinox/obsidian-gistr/blob/27ba6d6984aaf6c4d24a1c0b7e37fece88ada788/eslint.config.js#L1-L152
 
 <br />
 
 ##### ESLint < v9 Config
-- [.eslintrc](https://github.com/aetherinox/obsidian-gistr/blob/main/.eslintrc)
+- [.eslintrc](https://github.com/aetherinox/delete-deploy-env-action/blob/main/.eslintrc)
 
 <br />
 
 ##### Prettier
-- [.prettierrc](https://github.com/aetherinox/obsidian-gistr/blob/main/.prettierrc)
+- [.prettierrc](https://github.com/aetherinox/delete-deploy-env-action/blob/main/.prettierrc)
 
     ```yml
     printWidth: 120,
@@ -528,7 +528,7 @@ When writing your code, set your IDE to utilize **spaces**, with a configured si
 
 <!-- BADGE > BUTTON > SUBMIT ISSUES -->
   [btn-github-submit-img]: https://img.shields.io/badge/submit%20new%20issue-de1f5c?style=for-the-badge&logo=github&logoColor=FFFFFF
-  [btn-github-submit-uri]: https://github.com/aetherinox/obsidian-gistr/issues
+  [btn-github-submit-uri]: https://github.com/aetherinox/delete-deploy-env-action/issues
 
 <!-- prettier-ignore-end -->
 <!-- markdownlint-restore -->
