@@ -47,6 +47,14 @@ function delay(ms: number | 500) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/*
+    Func > getNum
+*/
+
+function getNum(num: string | "0") {
+    return Math.floor(Number(num)) || 0
+}
+
 async function createDeploymentWithStatus(
     octokit: Octokit,
     environment: string,
@@ -248,11 +256,21 @@ test.serial(' Should successfully remove deployments and not remove environment'
         t.truthy(environmentExists);
         const deployments = await getDeployments(octokit, environment, context);
         t.is(deployments.length, 0);
+
         // delete all artifacts
+        console.log(`Clean up remaining trash & artifacts`)
         delete process.env.INPUT_ONLYREMOVEDEPLOYMENTS;
+        delete process.env.INPUT_LIMIT;
         await main();
     },
 );
+
+/*
+    Tests > Remove Deployments Only
+
+    creates an environment and deployments.
+    only removes the deployment and keep the environment behind.
+*/
 
 test.serial( ' Successfully remove deployment ref only and not remove environment',
     async (t) =>
@@ -303,18 +321,28 @@ test.serial( ' Successfully remove deployment ref only and not remove environmen
         // clean up main
         process.env.INPUT_REF = 'main';
         await main();
+
         // delete all artifacts
+        console.log(`Clean up remaining trash & artifacts`)
         delete process.env.INPUT_ONLYREMOVEDEPLOYMENTS;
+        delete process.env.INPUT_LIMIT;
         await main();
     },
 );
 
-test.serial( ' Successfully remove multiple deployments only and not remove environment',
+/*
+    Tests > Remove Multiple Deployments
+
+    Generates multiple deployments in the same environment and deletes them.
+    Also tests a delay between each deployment deleted.
+*/
+
+test.serial( ' Successfully remove multiple deployments only and not remove environment using delay',
     async (t) =>
     {
 
-        const deployAmt = 10;
-        const delayAmt = 500;
+        const deployAmt = 10;                   // number of deployments to create
+        const delayAmt = 500;                   // delay between each deployment removed
         const newRef = 'release/v3';
         const environment = 'test-remove-deployment-ref-only';
 
@@ -329,7 +357,7 @@ test.serial( ' Successfully remove multiple deployments only and not remove envi
 
         for (let i = 1; i <= deployAmt; i++) {
             await createDeploymentWithStatus(octokit, environment, { ...context, ref });
-            console.log("Creating deployment for multitest")
+            console.log(`Creating deployment for multitest - ref ${ref}`)
             await delay(delayAmt);
         }
 
@@ -382,71 +410,88 @@ test.serial( ' Successfully remove multiple deployments only and not remove envi
         // clean up main
         process.env.INPUT_REF = 'main';
         await main();
+
         // delete all artifacts
+        console.log(`Clean up remaining trash & artifacts`)
         delete process.env.INPUT_ONLYREMOVEDEPLOYMENTS;
+        delete process.env.INPUT_LIMIT;
         await main();
     },
 );
 
-test.serial( ' Successfully remove deployment ref only and not remove environment (multiple)',
+/*
+    Test > Delete limited number of items
+
+    addds 10 deployments to an environment and then deletes 4.
+    A remaining 6 should return left over which will be checked against the test results
+*/
+
+test.serial( ' Successfully deleted limited results',
     async (t) =>
     {
 
-        const deployAmt = 10;
-        const delayAmt = 500;
-        const newRef = 'release/v3';
+        const deployAmt = 10;                   // number of deployments to create
+        const delayAmt = 500;                   // delay between each deployment removed
         const environment = 'test-remove-deployment-ref-only';
+        process.env.INPUT_REF = 'main';
 
         const { octokit, repo, ref } = t.context;
         const context: Context = repo;
 
+        /*
+            Create Environment
+        */
+
         await createEnvironment(octokit, environment, context);
 
         /*
-            Create multiple deployments within the environment to test removing them all.
+            Create multiple deployments within the environment to test removing them a certain number.
         */
 
         for (let i = 1; i <= deployAmt; i++) {
             await createDeploymentWithStatus(octokit, environment, { ...context, ref });
-            console.log("Creating deployment for multitest")
+            console.log(`Creating deployment for multitest - ref ${ref}`)
             await delay(delayAmt);
         }
-
-        /*
-            Branch must exist to create a deployment in your other repo branch
-        */
-
-        await createDeploymentWithStatus(octokit, environment, { ...context, ref: newRef });
 
         /*
             Assign env variables
         */
 
         process.env.INPUT_ENVIRONMENT = environment;
-        process.env.INPUT_REF = newRef;
         process.env.INPUT_ONLYREMOVEDEPLOYMENTS = 'true';
+        process.env.INPUT_LIMIT = '4';
 
         /*
-            Run main script
+            Run script to remove LIMIT number of deployments. This should mean 6 remain
         */
 
         await main();
-        let environmentExists = false;
+
+        /*
+            Prepare to fetch deployments left over
+        */
+
+        let deploymentStatus = false;
         let deployments: DeploymentRef[] = [];
+
+        /*
+            Get remaining deployments
+        */
 
         try
         {
-            const res = await octokit.request(
-                'GET /repos/{owner}/{repo}/environments/{environment_name}',
-                {
-                    owner: repo.owner,
-                    repo: repo.repo,
-                    environment_name: environment,
-                },
-            );
+            const res = await octokit.request('GET /repos/{owner}/{repo}/deployments',
+            {
+                owner: repo.owner,
+                repo: repo.repo,
+                environment_name: environment
+            });
 
-            environmentExists = res.status === 200;
+            deploymentStatus = res.status === 200;
             deployments = await getDeployments(octokit, environment, context);
+
+            console.log(deployments)
         }
         catch (err)
         {
@@ -454,16 +499,22 @@ test.serial( ' Successfully remove deployment ref only and not remove environmen
             t.fail();
         }
 
-        t.truthy(environmentExists);
-        t.is(deployments.length, deployAmt);
+        /*
+            Test Results
+        */
+
+        t.truthy(deploymentStatus);
+        t.is(deployments.length, 6);
         t.is(deployments[0].ref, 'main');
 
-        // clean up main
-        process.env.INPUT_REF = 'main';
-        await main();
+        /*
+            Clean up remaining stuff left over
+        */
+
         // delete all artifacts
+        console.log(`Clean up remaining trash & artifacts`)
         delete process.env.INPUT_ONLYREMOVEDEPLOYMENTS;
+        delete process.env.INPUT_LIMIT;
         await main();
     },
 );
-

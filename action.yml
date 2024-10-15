@@ -17,6 +17,10 @@ inputs:
         description: Set delay per call
         required: false
         default: "500"
+    limit:
+        description: Limit number of results
+        required: false
+        default: "100"
     ref:
         description: The `head_ref` or source branch name of the deployment to delete
         required: false

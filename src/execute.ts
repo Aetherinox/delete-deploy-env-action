@@ -3,27 +3,27 @@ import * as github from '@actions/github';
 import { Octokit } from '@octokit/core';
 import { RequestError } from '@octokit/request-error';
 
-interface ListDeploymentIDs { owner: string;repo: string;environment: string;ref: string }
+interface ListDeploymentIDs { owner: string; repo: string; environment: string; ref: string; limit: number }
 interface Deployment { owner: string;repo: string;deploymentId: number }
 interface Context { owner: string;repo: string }
 export interface DeploymentRef { deploymentId: number;ref: string }
 
 /*
-    Func > getTime
+    Func > getNum
 */
 
-function getTime(ms: string | undefined) {
-    return Math.floor(Number(ms)) || 0
+function getNum(num: string | "0") {
+    return Math.floor(Number(num)) || 0
 }
 
 /*
     Func > List Deployments
 */
 
-async function listDeployments(client: Octokit, { owner, repo, environment, ref = '' }: ListDeploymentIDs, page = 0): Promise < DeploymentRef[] >
+async function listDeployments(client: Octokit, { owner, repo, environment, ref = '', limit = 100 }: ListDeploymentIDs, page = 0): Promise < DeploymentRef[] >
 {
 
-    info(`      › 📝 Searching env ${environment}`);
+    info(`      › 📝 Searching env ${environment} - limit ${limit}`);
 
     const { data } = await client.request('GET /repos/{owner}/{repo}/deployments',
     {
@@ -31,7 +31,7 @@ async function listDeployments(client: Octokit, { owner, repo, environment, ref 
         repo,
         environment,
         ref,
-        per_page: 100,
+        per_page: limit,
         page,
     });
 
@@ -39,8 +39,8 @@ async function listDeployments(client: Octokit, { owner, repo, environment, ref 
 
     info( `      › 🗳️ Reading ${deploymentRefs.length} deployments on page ${page}` );
 
-    if (deploymentRefs.length === 100)
-        return deploymentRefs.concat( await listDeployments( client, { owner, repo, environment, ref }, page + 1 ) );
+    if (deploymentRefs.length === limit && limit === 100)
+        return deploymentRefs.concat( await listDeployments( client, { owner, repo, environment, ref, limit }, page + 1 ) );
 
     return deploymentRefs;
 }
@@ -134,7 +134,8 @@ export async function main(): Promise < void >
     const environment: string = getInput('environment', { required: true });
     const onlyRemoveDeployments: string = getInput('onlyRemoveDeployments', { required: false });
     const onlyDeactivateDeployments: string = getInput( 'onlyDeactivateDeployments', { required: false } );
-    const delayTime: string = getInput("delay", { required: false }) || "500";
+    const delayTime: number = getNum(getInput("delay", { required: false }) || "500");
+    const limit: number = getNum(getInput("limit", { required: false }) || "100");
     const ref: string = getInput('ref', { required: false });
 
     info('\n');
@@ -182,15 +183,15 @@ export async function main(): Promise < void >
 
     try
     {
-        const deploymentRefs = await listDeployments(client, { ...context.repo, environment, ref });
+        const deploymentRefs = await listDeployments(client, { ...context.repo, environment, ref, limit });
 
-        info(`      › 🔍 Found ${deploymentRefs.length} deployments`);
+        info(`      › 🔍 Found ${deploymentRefs.length} deployments for ref ${ref}`);
 
         let deploymentIds: number[];
         let deleteDeploymentMessage: string;
         let deactivateDeploymentMessage: string;
         let delayStart = 0;
-        const delayIncrement = getTime(delayTime);
+        const delayIncrement = delayTime;
 
         if (ref.length > 0)
         {

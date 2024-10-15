@@ -43,35 +43,29 @@ exports.main = void 0;
 const core_1 = __nccwpck_require__(2186);
 const github = __importStar(__nccwpck_require__(5438));
 /*
-    Func > getTime
+    Func > getNum
 */
-function getTime(ms) {
-    return Math.floor(Number(ms)) || 0;
-}
-/*
-    Func > delay
-*/
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, getTime(ms)));
+function getNum(num) {
+    return Math.floor(Number(num)) || 0;
 }
 /*
     Func > List Deployments
 */
-function listDeployments(client, { owner, repo, environment, ref = '' }, page = 0) {
+function listDeployments(client, { owner, repo, environment, ref = '', limit = 100 }, page = 0) {
     return __awaiter(this, void 0, void 0, function* () {
-        (0, core_1.info)(`      › 📝 Searching env ${environment}`);
+        (0, core_1.info)(`      › 📝 Searching env ${environment} - limit ${limit}`);
         const { data } = yield client.request('GET /repos/{owner}/{repo}/deployments', {
             owner,
             repo,
             environment,
             ref,
-            per_page: 100,
+            per_page: limit,
             page,
         });
         const deploymentRefs = data.map((deployment) => ({ deploymentId: deployment.id, ref: deployment.ref }));
         (0, core_1.info)(`      › 🗳️ Reading ${deploymentRefs.length} deployments on page ${page}`);
-        if (deploymentRefs.length === 100)
-            return deploymentRefs.concat(yield listDeployments(client, { owner, repo, environment, ref }, page + 1));
+        if (deploymentRefs.length === limit && limit === 100)
+            return deploymentRefs.concat(yield listDeployments(client, { owner, repo, environment, ref, limit }, page + 1));
         return deploymentRefs;
     });
 }
@@ -145,7 +139,8 @@ function main() {
         const environment = (0, core_1.getInput)('environment', { required: true });
         const onlyRemoveDeployments = (0, core_1.getInput)('onlyRemoveDeployments', { required: false });
         const onlyDeactivateDeployments = (0, core_1.getInput)('onlyDeactivateDeployments', { required: false });
-        const delayTime = (0, core_1.getInput)("delay", { required: false }) || "500";
+        const delayTime = getNum((0, core_1.getInput)("delay", { required: false }) || "500");
+        const limit = getNum((0, core_1.getInput)("limit", { required: false }) || "100");
         const ref = (0, core_1.getInput)('ref', { required: false });
         (0, core_1.info)('\n');
         (0, core_1.info)(`🛫 Starting Deployment Deletion action`);
@@ -179,13 +174,13 @@ function main() {
         }
         (0, core_1.info)(`   › 📋 Collect list of deployments`);
         try {
-            const deploymentRefs = yield listDeployments(client, Object.assign(Object.assign({}, context.repo), { environment, ref }));
-            (0, core_1.info)(`      › 🔍 Found ${deploymentRefs.length} deployments`);
+            const deploymentRefs = yield listDeployments(client, Object.assign(Object.assign({}, context.repo), { environment, ref, limit }));
+            (0, core_1.info)(`      › 🔍 Found ${deploymentRefs.length} deployments for ref ${ref}`);
             let deploymentIds;
             let deleteDeploymentMessage;
             let deactivateDeploymentMessage;
             let delayStart = 0;
-            const delayIncrement = getTime(delayTime);
+            const delayIncrement = delayTime;
             if (ref.length > 0) {
                 deleteDeploymentMessage = `   › 🗑️ Deleting deployment ref ${ref} in env ${environment}`;
                 deactivateDeploymentMessage = `   › 🔴 Deactivating deployment ref ${ref} in env ${environment}`;
@@ -202,27 +197,27 @@ function main() {
             /*
                 So that we don't hit the secondary rate limit, add a delay between each action in the promise
             */
-            const promises = deploymentIds.map(deploymentId => {
+            const promiseInactive = deploymentIds.map(deploymentId => {
                 delayStart += delayIncrement;
                 return new Promise(resolve => setTimeout(resolve, delayStart)).then(() => setDeploymentInactive(client, Object.assign(Object.assign({}, context.repo), { deploymentId })));
             });
+            yield Promise.all(promiseInactive);
             /*
-                Promise kept
+                Action > Delete Deployment
             */
-            yield Promise.all(promises);
             if (deleteDeployment) {
                 (0, core_1.info)(deleteDeploymentMessage);
                 /*
                     So that we don't hit the secondary rate limit, add a delay between each action in the promise
                 */
-                const promises = deploymentIds.map(deploymentId => {
+                const promiseDelete = deploymentIds.map(deploymentId => {
                     delayStart += delayIncrement;
                     return new Promise(resolve => setTimeout(resolve, delayStart)).then(() => deleteDeploymentById(client, Object.assign(Object.assign({}, context.repo), { deploymentId })));
                 });
                 /*
                     Promise kept
                 */
-                yield Promise.all(promises);
+                yield Promise.all(promiseDelete);
             }
             if (deleteEnvironment) {
                 yield deleteTheEnvironment(client, environment, context.repo);
