@@ -1,45 +1,67 @@
-name: CI
+# #
+#   @parent         github workflow
+#   @desc           test build
+#   @author         Aetherinox
+#   @url            https://github.com/Aetherinox
+# #
+
+run-name: "🌑 NPM › Tests"
+name: "☁️ NPM › Tests"
+
+# #
+#   triggers
+# #
 
 on:
-  [pull_request, push]
+    [pull_request, push]
+
+# #
+#   environment variables
+# #
 
 env:
-  GITHUB_TOKEN: ${{ secrets.TOKEN }}
-  OWNER: ${{ github.repository_owner }}
+    GITHUB_TOKEN: ${{ secrets.TOKEN }}
+    OWNER: ${{ github.repository_owner }}
+
+# #
+#   jobs
+# #
 
 jobs:
-  validate:
-    runs-on: ubuntu-latest
-    permissions: write-all
-    steps:
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
+    validate:
+        runs-on: ubuntu-latest
+        permissions: write-all
+        steps:
+            - name: Setup node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.x
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: npm ci
+            - name: Install dependencies
+              run: npm ci
 
-      - name: Lint
-        run: npm run lint
+            - name: Prettier
+              run: npm run pretty:fix
 
-      - name: Test
-        run: npm run test
+            - name: Lint
+              run: npm run lint
 
-      - name: Create GitHub deployment
-        uses: chrnorm/deployment-action@v2
-        id: deployment
-        with:
-          token: ${{ env.GITHUB_TOKEN }}
-          environment: test
-          initial-status: success
+            - name: Test
+              run: npm run test
 
-      - name: Delete GitHub deployment
-        uses: ./
-        with:
-          token: ${{ env.GITHUB_TOKEN }}
-          environment: test
-    
+            - name: Create GitHub deployment
+              uses: chrnorm/deployment-action@v2
+              id: deployment
+              with:
+                  token: ${{ env.GITHUB_TOKEN }}
+                  environment: test
+                  initial-status: success
+
+            - name: Delete GitHub deployment
+              uses: ./
+              with:
+                  token: ${{ env.GITHUB_TOKEN }}
+                  environment: test
