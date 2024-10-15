@@ -166,7 +166,6 @@ jobs:
             - name: "🔨 Create GitHub deployment"
               id: task_npmtest_gh_deployment_create
               uses: chrnorm/deployment-action@v2
-              id: deployment
               with:
                   token: ${{ env.GITHUB_TOKEN }}
                   environment: test
