@@ -211,10 +211,10 @@ test.serial('should successfully remove deployments and not remove environment',
         const { octokit, repo, ref } = t.context;
         const context: Context = repo;
         const environment = 'test-remove-deployments-only';
-  
+
         await createEnvironment(octokit, environment, context);
         await createDeploymentWithStatus(octokit, environment, { ...context, ref });
-  
+
         process.env.INPUT_ENVIRONMENT = environment;
         process.env.INPUT_ONLYREMOVEDEPLOYMENTS = 'true';
 
@@ -228,7 +228,7 @@ test.serial('should successfully remove deployments and not remove environment',
                 repo: repo.repo,
                 environment_name: environment,
             });
-  
+
             environmentExists = res.status === 200 ? true : false;
         }
         catch (err)
@@ -236,7 +236,7 @@ test.serial('should successfully remove deployments and not remove environment',
             t.log(err);
             t.fail();
         }
-  
+
         t.truthy(environmentExists);
         const deployments = await getDeployments(octokit, environment, context);
         t.is(deployments.length, 0);
@@ -252,12 +252,12 @@ test.serial( 'should successfully remove deployment ref only and not remove envi
         const environment = 'test-remove-deployment-ref-only';
         const { octokit, repo, ref } = t.context;
         const context: Context = repo;
-  
+
         await createEnvironment(octokit, environment, context);
         await createDeploymentWithStatus(octokit, environment, { ...context, ref });
 
         // make sure this branch exists to create another deployment
-        const newRef = 'release/v2';
+        const newRef = 'release/v3';
         await createDeploymentWithStatus(octokit, environment, { ...context, ref: newRef });
 
         process.env.INPUT_ENVIRONMENT = environment;
@@ -267,7 +267,7 @@ test.serial( 'should successfully remove deployment ref only and not remove envi
         await main();
         let environmentExists = false;
         let deployments: DeploymentRef[] = [];
-  
+
         try
         {
             const res = await octokit.request(
@@ -278,7 +278,7 @@ test.serial( 'should successfully remove deployment ref only and not remove envi
                     environment_name: environment,
                 },
             );
-  
+
             environmentExists = res.status === 200;
             deployments = await getDeployments(octokit, environment, context);
         }

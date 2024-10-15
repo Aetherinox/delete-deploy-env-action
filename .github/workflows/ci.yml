@@ -1,45 +1,104 @@
-name: CI
+# #
+#   @parent         github workflow
+#   @desc           test build
+#   @author         Aetherinox
+#   @url            https://github.com/Aetherinox
+# #
+
+run-name: "🌑 NPM › Tests"
+name: "☁️ NPM › Tests"
+
+# #
+#   triggers
+# #
 
 on:
-  [pull_request, push]
+    [pull_request, push]
+
+# #
+#   environment variables
+# #
 
 env:
-  GITHUB_TOKEN: ${{ secrets.TOKEN }}
-  OWNER: ${{ github.repository_owner }}
+    GITHUB_TOKEN: ${{ secrets.TOKEN }}
+    OWNER: ${{ github.repository_owner }}
+
+# #
+#   jobs
+# #
 
 jobs:
-  validate:
-    runs-on: ubuntu-latest
-    permissions: write-all
-    steps:
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
+    validate:
+        runs-on: ubuntu-latest
+        permissions: write-all
+        steps:
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
+            # #
+            #   [ CI ] Start
+            # #
 
-      - name: Install dependencies
-        run: npm ci
+            - name: "✅ Start"
+              id: task_dailyreset_start
+              run: |
+                  echo "Starting nightly reset"
 
-      - name: Lint
-        run: npm run lint
+            # #
+            #   [ CI ] Checkout
+            # #
 
-      - name: Test
-        run: npm run test
+            - name: "☑️ Checkout"
+              id: task_dailyreset_checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
-      - name: Create GitHub deployment
-        uses: chrnorm/deployment-action@v2
-        id: deployment
-        with:
-          token: ${{ env.GITHUB_TOKEN }}
-          environment: test
-          initial-status: success
+            # #
+            #   [ CI ] Node Setup
+            # #
 
-      - name: Delete GitHub deployment
-        uses: ./
-        with:
-          token: ${{ env.GITHUB_TOKEN }}
-          environment: test
-    
+            - name: "⚙️ Setup › Node"
+              id: task_ci_node_setup
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20.x'
+                  registry-url: https://npm.pkg.github.com/
+                  scope: '@aetherinox'
+
+            # #
+            #   [ Daily Reset ] Node - Install
+            # #
+
+            - name: "📦 NPM › Install"
+              id: task_cloudflare_npm_install
+              run: |
+                  npm install
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.SELF_TOKEN_CL }}
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Prettier
+              run: npm run pretty:fix
+
+            - name: Lint
+              run: npm run lint
+
+            - name: Test
+              run: npm run test
+              env:
+                  GITHUB_TOKEN: ${{ secrets.SELF_TOKEN_CL }}
+
+            - name: Create GitHub deployment
+              uses: chrnorm/deployment-action@v2
+              id: deployment
+              with:
+                  token: ${{ env.GITHUB_TOKEN }}
+                  environment: test
+                  initial-status: success
+
+            - name: Delete GitHub deployment
+              uses: ./
+              with:
+                  token: ${{ env.GITHUB_TOKEN }}
+                  environment: test
