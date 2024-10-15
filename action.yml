@@ -1,4 +1,4 @@
-name: 'Delete Deployment Environment'
+name: 'Delete Deployment Environments'
 description: 'Delete entire environments and deployments for the branch the action is running on'
 author: "Aetherinox"
 
