@@ -125,6 +125,7 @@ In this case, a [GitHub App](https://docs.github.com/en/developers/apps/getting-
 | `onlyRemoveDeployments`     | Delete deployments and not the environment. Default `false`                             |
 | `onlyDeactivateDeployments` | Deactivate the deployments but don't remove deployments or environment. Default `false` |
 | `ref`                       | The name of the deployment ref to delete                                                |
+| `delay`                     | Milliseconds to wait between each action.  Avoids secondary rate limit. Default: `500`  |
 
 <br />
 
