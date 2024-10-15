@@ -1,0 +1,25 @@
+{
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "plugin:github/typescript",
+    "plugin:prettier/recommended",
+    "plugin:escompat/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module",
+    "project": "./tsconfig.eslint.json"
+  },
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "ignorePatterns": ["dist/*"],
+  "rules": {
+    "new-cap": 0,
+    "no-template-curly-in-string": 1,
+    "capitalized-comments": 0,
+    "no-console": 0
+  }
+}

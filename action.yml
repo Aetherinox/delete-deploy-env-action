@@ -1,0 +1,28 @@
+name: 'Delete Deployment Environment'
+description: 'Delete entire environments and deployments for the branch the action is running on'
+author: "Aetherinox"
+
+branding:
+    icon: briefcase
+    color: gray-dark
+
+inputs:
+    token:
+        description: GitHub access token
+        required: true
+    environment:
+        description: Environment to be deleted
+        required: true
+    ref:
+        description: The `head_ref` or source branch name of the deployment to delete
+        required: false
+    onlyRemoveDeployments:
+        description: Only remove deployments, keep the environment. Defaults to false
+        required: false
+    onlyDeactivateDeployments:
+        description: Only inactive deployments, keep the environment and deployments. Defaults to false
+        required: false
+
+runs:
+    using: node20
+    main: 'dist/index.js'
