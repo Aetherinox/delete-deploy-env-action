@@ -309,7 +309,7 @@ test.serial( ' Successfully remove deployment ref only and not remove environmen
     },
 );
 
-test.serial( ' Successfully remove deployment ref only and not remove environment (multiple)',
+test.serial( ' Successfully remove multiple deployments only and not remove environment',
     async (t) =>
     {
 
