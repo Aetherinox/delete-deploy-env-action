@@ -1,4 +1,4 @@
-import * as core from '@actions/core';
+import { getInput, setOutput, setFailed, summary, info, debug, error } from "@actions/core";
 import * as github from '@actions/github';
 import { Octokit } from '@octokit/core';
 import { RequestError } from '@octokit/request-error';
@@ -8,14 +8,23 @@ interface Deployment { owner: string;repo: string;deploymentId: number }
 interface Context { owner: string;repo: string }
 export interface DeploymentRef { deploymentId: number;ref: string }
 
-function delay(ms: number | undefined) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+/*
+    Func > delay
+*/
+
+function delay(ms: string | undefined) {
+    const time = Math.floor(Number(ms))
+    return new Promise(resolve => setTimeout(resolve, time));
 }
+
+/*
+    Func > List Deployments
+*/
 
 async function listDeployments(client: Octokit, { owner, repo, environment, ref = '' }: ListDeploymentIDs, page = 0): Promise < DeploymentRef[] >
 {
 
-    core.info(`      › 📝 Searching env ${environment}`);
+    info(`      › 📝 Searching env ${environment}`);
 
     const { data } = await client.request('GET /repos/{owner}/{repo}/deployments',
     {
@@ -29,7 +38,7 @@ async function listDeployments(client: Octokit, { owner, repo, environment, ref 
 
     const deploymentRefs: DeploymentRef[] = data.map((deployment) => ( { deploymentId: deployment.id, ref: deployment.ref }));
 
-    core.info( `      › 🗳️ Reading ${deploymentRefs.length} deployments on page ${page}` );
+    info( `      › 🗳️ Reading ${deploymentRefs.length} deployments on page ${page}` );
 
     if (deploymentRefs.length === 100)
         return deploymentRefs.concat( await listDeployments( client, { owner, repo, environment, ref }, page + 1 ) );
@@ -37,10 +46,14 @@ async function listDeployments(client: Octokit, { owner, repo, environment, ref 
     return deploymentRefs;
 }
 
-async function setDeploymentInactive( client: Octokit, { owner, repo, deploymentId }: Deployment ): Promise < void >
+/*
+    Func > Deployments > Set Inactive
+*/
+
+async function setDeploymentInactive( delayTime: string, client: Octokit, { owner, repo, deploymentId }: Deployment ): Promise < void >
 {
-    await delay(100);
-    core.info(`      › ✔️ ID ${deploymentId} inactive`);
+    await delay(delayTime);
+    info(`      › ✔️ ID ${deploymentId} inactive`);
 
     await client.request( 'POST /repos/{owner}/{repo}/deployments/{deployment_id}/statuses',
     {
@@ -51,10 +64,14 @@ async function setDeploymentInactive( client: Octokit, { owner, repo, deployment
     });
 }
 
-async function deleteDeploymentById( client: Octokit, { owner, repo, deploymentId }: Deployment ): Promise < void >
+/*
+    Func > Deployments > Delete by ID
+*/
+
+async function deleteDeploymentById( delayTime: string, client: Octokit, { owner, repo, deploymentId }: Deployment ): Promise < void >
 {
-    await delay(100);
-    core.info(`      › ✔️ ID ${deploymentId} deleted`);
+    await delay(delayTime);
+    info(`      › ✔️ ID ${deploymentId} deleted`);
     await client.request( 'DELETE /repos/{owner}/{repo}/deployments/{deployment_id}',
     {
         owner,
@@ -63,10 +80,16 @@ async function deleteDeploymentById( client: Octokit, { owner, repo, deploymentI
     });
 }
 
-async function deleteTheEnvironment( client: Octokit, environment: string, { owner, repo }: Context ): Promise < void >
+/*
+    Func > Environment > Delete
+*/
+
+async function deleteTheEnvironment( delayTime: string, client: Octokit, environment: string, { owner, repo }: Context ): Promise < void >
 {
 
+    await delay(delayTime);
     let existingEnv = false;
+
     try
     {
         const getEnvResult = await client.request( 'GET /repos/{owner}/{repo}/environments/{environment_name}',
@@ -82,15 +105,15 @@ async function deleteTheEnvironment( client: Octokit, environment: string, { own
     {
         if ((err as RequestError).status !== 404)
         {
-            core.error('Error deleting environment');
+            error('Error deleting environment');
             throw err;
         }
     }
 
     if (existingEnv)
     {
-        await delay(100);
-        core.info(`   › 🗑️ Deleting env ${environment}`);
+        await delay(delayTime);
+        info(`   › 🗑️ Deleting env ${environment}`);
         await client.request( 'DELETE /repos/{owner}/{repo}/environments/{environment_name}',
         {
             owner,
@@ -98,9 +121,13 @@ async function deleteTheEnvironment( client: Octokit, environment: string, { own
             environment_name: environment,
         });
 
-        core.info(`      › ✔️ Deleted`);
+        info(`      › ✔️ Deleted`);
     }
 }
+
+/*
+    Func > Github Action > Main
+*/
 
 export async function main(): Promise < void >
 {
@@ -108,14 +135,15 @@ export async function main(): Promise < void >
     let deleteEnvironment = true;
 
     const { context } = github;
-    const token: string = core.getInput('token', { required: true });
-    const environment: string = core.getInput('environment', { required: true });
-    const onlyRemoveDeployments: string = core.getInput('onlyRemoveDeployments', { required: false });
-    const onlyDeactivateDeployments: string = core.getInput( 'onlyDeactivateDeployments', { required: false } );
-    const ref: string = core.getInput('ref', { required: false });
+    const token: string = getInput('token', { required: true });
+    const environment: string = getInput('environment', { required: true });
+    const onlyRemoveDeployments: string = getInput('onlyRemoveDeployments', { required: false });
+    const onlyDeactivateDeployments: string = getInput( 'onlyDeactivateDeployments', { required: false } );
+    const delayTime: string = getInput("delay", { required: false }) || "500";
+    const ref: string = getInput('ref', { required: false });
 
-    core.info('\n');
-    core.info(`🛫 Starting Deployment Deletion action`);
+    info('\n');
+    info(`🛫 Starting Deployment Deletion action`);
 
     const client: Octokit = github.getOctokit(token,
     {
@@ -155,13 +183,13 @@ export async function main(): Promise < void >
         deleteEnvironment = false;
     }
 
-    core.info(`   › 📋 Collect list of deployments`);
+    info(`   › 📋 Collect list of deployments`);
 
     try
     {
         const deploymentRefs = await listDeployments(client, { ...context.repo, environment, ref });
 
-        core.info(`      › 🔍 Found ${deploymentRefs.length} deployments`);
+        info(`      › 🔍 Found ${deploymentRefs.length} deployments`);
 
         let deploymentIds: number[];
         let deleteDeploymentMessage: string;
@@ -184,11 +212,11 @@ export async function main(): Promise < void >
             );
         }
 
-        core.info(deactivateDeploymentMessage);
+        info(deactivateDeploymentMessage);
 
         await Promise.all(
             deploymentIds.map((deploymentId) =>
-                setDeploymentInactive(client,
+                setDeploymentInactive(delayTime, client,
                 {
                     ...context.repo,
                     deploymentId
@@ -198,23 +226,23 @@ export async function main(): Promise < void >
 
         if (deleteDeployment)
         {
-            core.info(deleteDeploymentMessage);
+            info(deleteDeploymentMessage);
 
             await Promise.all(
-                deploymentIds.map((deploymentId) => deleteDeploymentById(client, { ...context.repo, deploymentId })),
+                deploymentIds.map((deploymentId) => deleteDeploymentById(delayTime, client, { ...context.repo, deploymentId })),
             );
         }
 
         if (deleteEnvironment)
         {
-            await deleteTheEnvironment(client, environment, context.repo);
+            await deleteTheEnvironment(delayTime, client, environment, context.repo);
         }
 
-        core.info('   › ✔️ Action completed successfully');
+        info('   › ✔️ Action completed successfully');
 
     }
     catch (error)
     {
-        core.setFailed((error as RequestError).message);
+        setFailed((error as RequestError).message);
     }
 }

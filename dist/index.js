@@ -40,14 +40,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.main = void 0;
-const core = __importStar(__nccwpck_require__(2186));
+const core_1 = __nccwpck_require__(2186);
 const github = __importStar(__nccwpck_require__(5438));
+/*
+    Func > delay
+*/
 function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    const time = Math.floor(Number(ms));
+    return new Promise(resolve => setTimeout(resolve, time));
 }
+/*
+    Func > List Deployments
+*/
 function listDeployments(client, { owner, repo, environment, ref = '' }, page = 0) {
     return __awaiter(this, void 0, void 0, function* () {
-        core.info(`      › 📝 Searching env ${environment}`);
+        (0, core_1.info)(`      › 📝 Searching env ${environment}`);
         const { data } = yield client.request('GET /repos/{owner}/{repo}/deployments', {
             owner,
             repo,
@@ -57,16 +64,19 @@ function listDeployments(client, { owner, repo, environment, ref = '' }, page = 
             page,
         });
         const deploymentRefs = data.map((deployment) => ({ deploymentId: deployment.id, ref: deployment.ref }));
-        core.info(`      › 🗳️ Reading ${deploymentRefs.length} deployments on page ${page}`);
+        (0, core_1.info)(`      › 🗳️ Reading ${deploymentRefs.length} deployments on page ${page}`);
         if (deploymentRefs.length === 100)
             return deploymentRefs.concat(yield listDeployments(client, { owner, repo, environment, ref }, page + 1));
         return deploymentRefs;
     });
 }
-function setDeploymentInactive(client, { owner, repo, deploymentId }) {
+/*
+    Func > Deployments > Set Inactive
+*/
+function setDeploymentInactive(delayTime, client, { owner, repo, deploymentId }) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield delay(100);
-        core.info(`      › ✔️ ID ${deploymentId} inactive`);
+        yield delay(delayTime);
+        (0, core_1.info)(`      › ✔️ ID ${deploymentId} inactive`);
         yield client.request('POST /repos/{owner}/{repo}/deployments/{deployment_id}/statuses', {
             owner,
             repo,
@@ -75,10 +85,13 @@ function setDeploymentInactive(client, { owner, repo, deploymentId }) {
         });
     });
 }
-function deleteDeploymentById(client, { owner, repo, deploymentId }) {
+/*
+    Func > Deployments > Delete by ID
+*/
+function deleteDeploymentById(delayTime, client, { owner, repo, deploymentId }) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield delay(100);
-        core.info(`      › ✔️ ID ${deploymentId} deleted`);
+        yield delay(delayTime);
+        (0, core_1.info)(`      › ✔️ ID ${deploymentId} deleted`);
         yield client.request('DELETE /repos/{owner}/{repo}/deployments/{deployment_id}', {
             owner,
             repo,
@@ -86,8 +99,12 @@ function deleteDeploymentById(client, { owner, repo, deploymentId }) {
         });
     });
 }
-function deleteTheEnvironment(client, environment, { owner, repo }) {
+/*
+    Func > Environment > Delete
+*/
+function deleteTheEnvironment(delayTime, client, environment, { owner, repo }) {
     return __awaiter(this, void 0, void 0, function* () {
+        yield delay(delayTime);
         let existingEnv = false;
         try {
             const getEnvResult = yield client.request('GET /repos/{owner}/{repo}/environments/{environment_name}', {
@@ -99,34 +116,38 @@ function deleteTheEnvironment(client, environment, { owner, repo }) {
         }
         catch (err) {
             if (err.status !== 404) {
-                core.error('Error deleting environment');
+                (0, core_1.error)('Error deleting environment');
                 throw err;
             }
         }
         if (existingEnv) {
-            yield delay(100);
-            core.info(`   › 🗑️ Deleting env ${environment}`);
+            yield delay(delayTime);
+            (0, core_1.info)(`   › 🗑️ Deleting env ${environment}`);
             yield client.request('DELETE /repos/{owner}/{repo}/environments/{environment_name}', {
                 owner,
                 repo,
                 environment_name: environment,
             });
-            core.info(`      › ✔️ Deleted`);
+            (0, core_1.info)(`      › ✔️ Deleted`);
         }
     });
 }
+/*
+    Func > Github Action > Main
+*/
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let deleteDeployment = true;
         let deleteEnvironment = true;
         const { context } = github;
-        const token = core.getInput('token', { required: true });
-        const environment = core.getInput('environment', { required: true });
-        const onlyRemoveDeployments = core.getInput('onlyRemoveDeployments', { required: false });
-        const onlyDeactivateDeployments = core.getInput('onlyDeactivateDeployments', { required: false });
-        const ref = core.getInput('ref', { required: false });
-        core.info('\n');
-        core.info(`🛫 Starting Deployment Deletion action`);
+        const token = (0, core_1.getInput)('token', { required: true });
+        const environment = (0, core_1.getInput)('environment', { required: true });
+        const onlyRemoveDeployments = (0, core_1.getInput)('onlyRemoveDeployments', { required: false });
+        const onlyDeactivateDeployments = (0, core_1.getInput)('onlyDeactivateDeployments', { required: false });
+        const delayTime = (0, core_1.getInput)("delay", { required: false }) || "500";
+        const ref = (0, core_1.getInput)('ref', { required: false });
+        (0, core_1.info)('\n');
+        (0, core_1.info)(`🛫 Starting Deployment Deletion action`);
         const client = github.getOctokit(token, {
             throttle: {
                 onRateLimit: (retryAfter = 0, options) => {
@@ -155,10 +176,10 @@ function main() {
         else if (onlyRemoveDeployments === 'true') {
             deleteEnvironment = false;
         }
-        core.info(`   › 📋 Collect list of deployments`);
+        (0, core_1.info)(`   › 📋 Collect list of deployments`);
         try {
             const deploymentRefs = yield listDeployments(client, Object.assign(Object.assign({}, context.repo), { environment, ref }));
-            core.info(`      › 🔍 Found ${deploymentRefs.length} deployments`);
+            (0, core_1.info)(`      › 🔍 Found ${deploymentRefs.length} deployments`);
             let deploymentIds;
             let deleteDeploymentMessage;
             let deactivateDeploymentMessage;
@@ -174,19 +195,19 @@ function main() {
                 deactivateDeploymentMessage = `   › 🔴 Deactivating all ${deploymentRefs.length} deployments in env ${environment}`;
                 deploymentIds = deploymentRefs.map((deployment) => deployment.deploymentId);
             }
-            core.info(deactivateDeploymentMessage);
-            yield Promise.all(deploymentIds.map((deploymentId) => setDeploymentInactive(client, Object.assign(Object.assign({}, context.repo), { deploymentId }))));
+            (0, core_1.info)(deactivateDeploymentMessage);
+            yield Promise.all(deploymentIds.map((deploymentId) => setDeploymentInactive(delayTime, client, Object.assign(Object.assign({}, context.repo), { deploymentId }))));
             if (deleteDeployment) {
-                core.info(deleteDeploymentMessage);
-                yield Promise.all(deploymentIds.map((deploymentId) => deleteDeploymentById(client, Object.assign(Object.assign({}, context.repo), { deploymentId }))));
+                (0, core_1.info)(deleteDeploymentMessage);
+                yield Promise.all(deploymentIds.map((deploymentId) => deleteDeploymentById(delayTime, client, Object.assign(Object.assign({}, context.repo), { deploymentId }))));
             }
             if (deleteEnvironment) {
-                yield deleteTheEnvironment(client, environment, context.repo);
+                yield deleteTheEnvironment(delayTime, client, environment, context.repo);
             }
-            core.info('   › ✔️ Action completed successfully');
+            (0, core_1.info)('   › ✔️ Action completed successfully');
         }
         catch (error) {
-            core.setFailed(error.message);
+            (0, core_1.setFailed)(error.message);
         }
     });
 }
