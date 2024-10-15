@@ -14,7 +14,7 @@
             "avatar_url": "https://avatars.githubusercontent.com/u/118329232?v=4",
             "profile": "https://gitlab.com/Aetherinox",
             "contributions": ["code", "projectManagement", "fundingFinding"]
-        },
+        }
     ],
     "contributorsPerLine": 7,
     "linkToUsage": false,

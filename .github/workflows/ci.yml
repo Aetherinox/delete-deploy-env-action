@@ -13,7 +13,12 @@ name: "☁️ NPM › Tests"
 # #
 
 on:
-    [pull_request, push]
+  push:
+      branches:
+          - "main"
+  pull_request:
+      branches:
+          - "main"
 
 # #
 #   environment variables
