@@ -17,14 +17,6 @@ function getTime(ms: string | undefined) {
 }
 
 /*
-    Func > delay
-*/
-
-function delay(ms: string | undefined) {
-    return new Promise(resolve => setTimeout(resolve, getTime(ms)));
-}
-
-/*
     Func > List Deployments
 */
 
@@ -223,18 +215,18 @@ export async function main(): Promise < void >
             So that we don't hit the secondary rate limit, add a delay between each action in the promise
         */
 
-        const promises = deploymentIds.map(deploymentId =>
+        const promiseInactive = deploymentIds.map(deploymentId =>
         {
             delayStart += delayIncrement;
             return new Promise(resolve => setTimeout(resolve, delayStart)).then(() =>
                 setDeploymentInactive(client, { ...context.repo, deploymentId }));
         })
 
-        /*
-            Promise kept
-        */
+        await Promise.all(promiseInactive);
 
-        await Promise.all(promises);
+        /*
+            Action > Delete Deployment
+        */
 
         if (deleteDeployment)
         {
@@ -244,7 +236,7 @@ export async function main(): Promise < void >
                 So that we don't hit the secondary rate limit, add a delay between each action in the promise
             */
 
-            const promises = deploymentIds.map(deploymentId =>
+            const promiseDelete = deploymentIds.map(deploymentId =>
             {
                 delayStart += delayIncrement;
                 return new Promise(resolve => setTimeout(resolve, delayStart)).then(() =>
@@ -255,7 +247,7 @@ export async function main(): Promise < void >
                 Promise kept
             */
 
-            await Promise.all(promises);
+            await Promise.all(promiseDelete);
         }
 
         if (deleteEnvironment)
