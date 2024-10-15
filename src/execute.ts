@@ -1,4 +1,4 @@
-import { getInput, setOutput, setFailed, summary, info, debug, error } from "@actions/core";
+import { getInput, setFailed, info, error } from "@actions/core";
 import * as github from '@actions/github';
 import { Octokit } from '@octokit/core';
 import { RequestError } from '@octokit/request-error';
@@ -241,8 +241,8 @@ export async function main(): Promise < void >
         info('   › ✔️ Action completed successfully');
 
     }
-    catch (error)
+    catch (err)
     {
-        setFailed((error as RequestError).message);
+        setFailed((err as RequestError).message);
     }
 }

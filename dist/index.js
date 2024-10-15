@@ -206,8 +206,8 @@ function main() {
             }
             (0, core_1.info)('   › ✔️ Action completed successfully');
         }
-        catch (error) {
-            (0, core_1.setFailed)(error.message);
+        catch (err) {
+            (0, core_1.setFailed)(err.message);
         }
     });
 }
