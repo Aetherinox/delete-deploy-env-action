@@ -9,12 +9,11 @@ interface Context { owner: string;repo: string }
 export interface DeploymentRef { deploymentId: number;ref: string }
 
 /*
-    Func > delay
+    Func > getTime
 */
 
-function delay(ms: string | undefined) {
-    const time = Math.floor(Number(ms))
-    return new Promise(resolve => setTimeout(resolve, time));
+function getTime(ms: string | undefined) {
+    return Math.floor(Number(ms)) || 0
 }
 
 /*
@@ -50,9 +49,8 @@ async function listDeployments(client: Octokit, { owner, repo, environment, ref 
     Func > Deployments > Set Inactive
 */
 
-async function setDeploymentInactive( delayTime: string, client: Octokit, { owner, repo, deploymentId }: Deployment ): Promise < void >
+async function setDeploymentInactive( client: Octokit, { owner, repo, deploymentId }: Deployment ): Promise < void >
 {
-    await delay(delayTime);
     info(`      › ✔️ ID ${deploymentId} inactive`);
 
     await client.request( 'POST /repos/{owner}/{repo}/deployments/{deployment_id}/statuses',
@@ -68,9 +66,8 @@ async function setDeploymentInactive( delayTime: string, client: Octokit, { owne
     Func > Deployments > Delete by ID
 */
 
-async function deleteDeploymentById( delayTime: string, client: Octokit, { owner, repo, deploymentId }: Deployment ): Promise < void >
+async function deleteDeploymentById( client: Octokit, { owner, repo, deploymentId }: Deployment ): Promise < void >
 {
-    await delay(delayTime);
     info(`      › ✔️ ID ${deploymentId} deleted`);
     await client.request( 'DELETE /repos/{owner}/{repo}/deployments/{deployment_id}',
     {
@@ -84,10 +81,9 @@ async function deleteDeploymentById( delayTime: string, client: Octokit, { owner
     Func > Environment > Delete
 */
 
-async function deleteTheEnvironment( delayTime: string, client: Octokit, environment: string, { owner, repo }: Context ): Promise < void >
+async function deleteTheEnvironment( client: Octokit, environment: string, { owner, repo }: Context ): Promise < void >
 {
 
-    await delay(delayTime);
     let existingEnv = false;
 
     try
@@ -112,7 +108,6 @@ async function deleteTheEnvironment( delayTime: string, client: Octokit, environ
 
     if (existingEnv)
     {
-        await delay(delayTime);
         info(`   › 🗑️ Deleting env ${environment}`);
         await client.request( 'DELETE /repos/{owner}/{repo}/environments/{environment_name}',
         {
@@ -194,6 +189,8 @@ export async function main(): Promise < void >
         let deploymentIds: number[];
         let deleteDeploymentMessage: string;
         let deactivateDeploymentMessage: string;
+        let delayStart = 0;
+        const delayIncrement = getTime(delayTime);
 
         if (ref.length > 0)
         {
@@ -214,28 +211,48 @@ export async function main(): Promise < void >
 
         info(deactivateDeploymentMessage);
 
-        await Promise.all(
-            deploymentIds.map((deploymentId) =>
-                setDeploymentInactive(delayTime, client,
-                {
-                    ...context.repo,
-                    deploymentId
-                }),
-            ),
-        );
+        /*
+            So that we don't hit the secondary rate limit, add a delay between each action in the promise
+        */
+
+        const promiseInactive = deploymentIds.map(deploymentId =>
+        {
+            delayStart += delayIncrement;
+            return new Promise(resolve => setTimeout(resolve, delayStart)).then(() =>
+                setDeploymentInactive(client, { ...context.repo, deploymentId }));
+        })
+
+        await Promise.all(promiseInactive);
+
+        /*
+            Action > Delete Deployment
+        */
 
         if (deleteDeployment)
         {
             info(deleteDeploymentMessage);
 
-            await Promise.all(
-                deploymentIds.map((deploymentId) => deleteDeploymentById(delayTime, client, { ...context.repo, deploymentId })),
-            );
+            /*
+                So that we don't hit the secondary rate limit, add a delay between each action in the promise
+            */
+
+            const promiseDelete = deploymentIds.map(deploymentId =>
+            {
+                delayStart += delayIncrement;
+                return new Promise(resolve => setTimeout(resolve, delayStart)).then(() =>
+                    deleteDeploymentById(client, { ...context.repo, deploymentId }));
+            })
+
+            /*
+                Promise kept
+            */
+
+            await Promise.all(promiseDelete);
         }
 
         if (deleteEnvironment)
         {
-            await deleteTheEnvironment(delayTime, client, environment, context.repo);
+            await deleteTheEnvironment(client, environment, context.repo);
         }
 
         info('   › ✔️ Action completed successfully');
