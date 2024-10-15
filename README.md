@@ -35,6 +35,26 @@ A github action which allows you to delete deployments and environments.
 
 <br />
 
+- [About](#about)
+  - [Obtain A Token](#obtain-a-token)
+    - [Example](#example)
+- [Inputs](#inputs)
+- [Usage](#usage)
+  - [Deactivate / Remove Deployment Environment (also from settings)](#deactivate--remove-deployment-environment-also-from-settings)
+  - [Deactivate / Remove Deployment Environment](#deactivate--remove-deployment-environment)
+  - [Deactivates and removes a deployment ref of a given environment](#deactivates-and-removes-a-deployment-ref-of-a-given-environment)
+  - [Deactivates deployment environment](#deactivates-deployment-environment)
+  - [Avoid Secondary Rate Limiting](#avoid-secondary-rate-limiting)
+- [Rate Limits](#rate-limits)
+- [Contributors ✨](#contributors-)
+
+
+<br />
+
+---
+
+<br />
+
 ## About
 
 GitHub action that will find and delete all deployments by deployment name as well as the GitHub environment
