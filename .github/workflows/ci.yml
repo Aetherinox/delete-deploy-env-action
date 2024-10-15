@@ -146,8 +146,8 @@ jobs:
             - name: "🪪 .ENV › Read"
               id: task_npmtest_dotenv_print
               run: |
-                  echo "GUID: ${{ steps.task_release_dotenv_get.outputs.GUID }}"
-                  echo "UUID: ${{ steps.task_release_dotenv_get.outputs.UUID }}"
+                  echo "GUID: ${{ steps.task_npmtest_dotenv_get.outputs.GUID }}"
+                  echo "UUID: ${{ steps.task_npmtest_dotenv_get.outputs.UUID }}"
 
             # #
             #   [ CI ] Test
