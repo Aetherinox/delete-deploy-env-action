@@ -290,14 +290,14 @@ jobs:
         permissions: write-all
 
         steps:
-            - name: >-
-                ⚙️ Deployments › Clean
-              uses: Aetherinox/delete-deploy-env-action@v3.0.0
-              with:
-                token: ${{ secrets.GITHUB_TOKEN }}
-                environment: orion
-                onlyRemoveDeployments: true
-                delay: "500"
+          - name: >-
+              ⚙️ Deployments › Clean
+            uses: Aetherinox/delete-deploy-env-action@v3.0.0
+            with:
+              token: ${{ secrets.GITHUB_TOKEN }}
+              environment: orion
+              onlyRemoveDeployments: true
+              delay: "500"
 ```
 
 <br />
@@ -312,14 +312,14 @@ jobs:
         permissions: write-all
 
         steps:
-            - name: >-
-                ⚙️ Deployments › Clean
-              uses: Aetherinox/delete-deploy-env-action@v3.0.0
-              with:
-                token: ${{ secrets.GITHUB_TOKEN }}
-                environment: orion
-                onlyRemoveDeployments: true
-                limit: 43
+          - name: >-
+              ⚙️ Deployments › Clean
+            uses: Aetherinox/delete-deploy-env-action@v3.0.0
+            with:
+              token: ${{ secrets.GITHUB_TOKEN }}
+              environment: orion
+              onlyRemoveDeployments: true
+              limit: 43
 ```
 
 <br />
@@ -333,15 +333,15 @@ jobs:
         permissions: write-all
 
         steps:
-            - name: >-
-                ⚙️ Deployments › Clean
-              uses: Aetherinox/delete-deploy-env-action@v3.0.0
-              with:
-                token: ${{ secrets.GITHUB_TOKEN }}
-                environment: orion
-                onlyRemoveDeployments: true
-                delay: 500
-                limit: 165
+          - name: >-
+              ⚙️ Deployments › Clean
+            uses: Aetherinox/delete-deploy-env-action@v3.0.0
+            with:
+              token: ${{ secrets.GITHUB_TOKEN }}
+              environment: orion
+              onlyRemoveDeployments: true
+              delay: 500
+              limit: 165
 ```
 
 <br />
