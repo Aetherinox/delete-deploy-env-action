@@ -144,7 +144,7 @@ In this case, a [GitHub App](https://docs.github.com/en/developers/apps/getting-
              # Use a JWT created with your GitHub App's private key
              token: ${{ steps.get-token.outputs.token }}
              environment: pr-${{ github.event.number }}
-             ref: ${{ github.ref_name }}
+             ref: ${{ github.head_ref }}
    ```
 
 <br />
