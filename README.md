@@ -294,7 +294,7 @@ jobs:
                 ⚙️ Deployments › Clean
               uses: Aetherinox/delete-deploy-env-action@v3.0.0
               with:
-                  token: ${{ secrets.SELF_TOKEN_CL }}
+                  token: ${{ secrets.GITHUB_TOKEN }}
                   environment: orion
                   onlyRemoveDeployments: true
                   delay: "500"
@@ -316,7 +316,7 @@ jobs:
                 ⚙️ Deployments › Clean
               uses: Aetherinox/delete-deploy-env-action@v3.0.0
               with:
-                  token: ${{ secrets.SELF_TOKEN_CL }}
+                  token: ${{ secrets.GITHUB_TOKEN }}
                   environment: orion
                   onlyRemoveDeployments: true
                   limit: 43
@@ -337,7 +337,7 @@ jobs:
                 ⚙️ Deployments › Clean
               uses: Aetherinox/delete-deploy-env-action@v3.0.0
               with:
-                  token: ${{ secrets.SELF_TOKEN_CL }}
+                  token: ${{ secrets.GITHUB_TOKEN }}
                   environment: orion
                   onlyRemoveDeployments: true
                   delay: 500
