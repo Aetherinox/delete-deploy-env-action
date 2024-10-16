@@ -7,19 +7,9 @@
     "target": "es6",
     "sourceMap": true,
     "lib": ["es6"],
-    "outDir": "./lib",
-    "rootDir": "./src",
-    "baseUrl": "./src",
+    "outDir": "lib",
+    "rootDir": "src",
     "moduleResolution": "node",
-    "paths": {
-        "@/*": [
-            "*"
-        ]
-    }
   },
-  "include": [
-      "src/*.ts",
-      "src/*.js",
-      "src/*.json"
-  ],
+  "exclude": ["node_modules", "__tests__/*.test.ts"],
 }
