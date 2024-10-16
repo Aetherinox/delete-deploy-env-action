@@ -11,8 +11,7 @@ const stylisticPlus =  require('@stylistic/eslint-plugin-plus')
 module.exports = [
 {
     files: [
-        'src/*.ts',
-        '__tests__/*.ts'
+        'src/*.ts'
     ],
     plugins: {
         '@typescript-eslint': ts,
