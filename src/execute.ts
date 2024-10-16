@@ -23,7 +23,7 @@ function getNum(num: string | "0") {
 async function listDeployments(client: Octokit, { owner, repo, environment, ref = '', limit = 100 }: ListDeploymentIDs, page = 0): Promise < DeploymentRef[] >
 {
 
-    info(`      › 📝 Searching env ${environment} › \x1b[38;5;1m${limit} limit\x1b[0m`);
+    info(`      › 📝 Searching \x1b[38;5;9menv ${environment}\x1b[0m`);
 
     const { data } = await client.request('GET /repos/{owner}/{repo}/deployments',
     {
@@ -44,7 +44,7 @@ async function listDeployments(client: Octokit, { owner, repo, environment, ref 
     const itemsTotal = deploymentRefs.length;
 
     if (!limit || limit === 100) {
-        info( `      › 📚 Reading \x1b[38;5;32m${itemsTotal} deployments\x1b[0m on \x1b[38;5;32mpage ${page}\x1b[0m › \x1b[38;5;1m${limit} limit\x1b[0m` );
+        info( `      › ⚙️ Using default limit of \x1b[38;5;1m${limit}\x1b[0m` );
         if (itemsTotal === 100)
             return deploymentRefs.concat( await listDeployments( client, { owner, repo, environment, ref, limit }, page + 1 ) );
 
@@ -61,7 +61,7 @@ async function listDeployments(client: Octokit, { owner, repo, environment, ref 
         */
 
         if ( itemsTotal < limit && page < pagesNeeded) {
-            info( `      › 📚 Reading \x1b[38;5;32m${itemsTotal} deployments\x1b[0m on \x1b[38;5;32mpage ${page}\x1b[0m › \x1b[38;5;1m${limit} limit\x1b[0m on ${pagesNeeded} pages` );
+            info( `      › ⚙️ Using custom limit of \x1b[38;5;1m${limit}\x1b[0m › reading page \x1b[38;5;32mpage ${page}/${pagesNeeded}\x1b[0m` );
             return deploymentRefs.concat( await listDeployments( client, { owner, repo, environment, ref, limit }, page + 1 ) );
         }
     }
@@ -70,7 +70,7 @@ async function listDeployments(client: Octokit, { owner, repo, environment, ref 
         Done getting items, return deployment list
     */
 
-    info( `      › 📚 Getting \x1b[38;5;32m${itemsTotal} deployments\x1b[0m on \x1b[38;5;32mpage ${page}\x1b[0m › \x1b[38;5;1m${limit} limit\x1b[0m` );
+    info( `      › 📚 Finished fetching deployment results` );
 
     return deploymentRefs;
 }
@@ -137,7 +137,7 @@ async function deleteTheEnvironment( client: Octokit, environment: string, { own
 
     if (existingEnv)
     {
-        info(`   › 🗑️ Deleting env ${environment}`);
+        info(`   › 🗑️ Deleting \x1b[38;5;9menv ${environment}\x1b[0m`);
         await client.request( 'DELETE /repos/{owner}/{repo}/environments/{environment_name}',
         {
             owner,
@@ -224,16 +224,16 @@ export async function main(): Promise < void >
 
         if (ref.length > 0)
         {
-            deleteDeploymentMessage = `   › 🗑️ Deleting deployment \x1b[38;5;13mref ${ref}\x1b[0m in env ${environment}`;
-            deactivateDeploymentMessage = `   › 🔴 Deactivating deployment \x1b[38;5;13mref ${ref}\x1b[0m in env ${environment}`;
+            deleteDeploymentMessage = `   › 🗑️ Deleting deployment \x1b[38;5;13mref ${ref}\x1b[0m in \x1b[38;5;9menv ${environment}\x1b[0m`;
+            deactivateDeploymentMessage = `   › 🔴 Deactivating deployment \x1b[38;5;13mref ${ref}\x1b[0m in \x1b[38;5;9menv ${environment}\x1b[0m`;
             deploymentIds = deploymentRefs
                 .filter((deployment) => deployment.ref === ref)
                 .map((deployment) => deployment.deploymentId);
         }
         else
         {
-            deleteDeploymentMessage = `   › 🗑️ Deleting all ${deploymentRefs.length} deployments in env ${environment}`;
-            deactivateDeploymentMessage = `   › 🔴 Deactivating all ${deploymentRefs.length} deployments in env ${environment}`;
+            deleteDeploymentMessage = `   › 🗑️ Deleting all ${deploymentRefs.length} deployments in \x1b[38;5;9menv ${environment}\x1b[0m`;
+            deactivateDeploymentMessage = `   › 🔴 Deactivating all ${deploymentRefs.length} deployments in \x1b[38;5;9menv ${environment}\x1b[0m`;
             deploymentIds = deploymentRefs.map(
                 (deployment) => deployment.deploymentId,
             );
