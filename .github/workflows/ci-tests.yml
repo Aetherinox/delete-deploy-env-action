@@ -113,9 +113,9 @@ jobs:
             #   [ CI ] Pretty
             # #
 
-            - name: "📦 NPM › Prettier"
-              id: task_npmtest_npm_prettier
-              run: npm run pretty:fix
+            #- name: "📦 NPM › Prettier"
+            #  id: task_npmtest_npm_prettier
+            #  run: npm run pretty:fix
 
             # #
             #   [ CI ] Lint
