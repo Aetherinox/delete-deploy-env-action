@@ -45,6 +45,7 @@ A github action which allows you to delete deployments and environments.
   - [Deactivates and removes a deployment ref of a given environment](#deactivates-and-removes-a-deployment-ref-of-a-given-environment)
   - [Deactivates deployment environment](#deactivates-deployment-environment)
   - [Avoid Secondary Rate Limiting](#avoid-secondary-rate-limiting)
+  - [Limit Deployments Removed](#limit-deployments-removed)
 - [Rate Limits](#rate-limits)
 - [Contributors ✨](#contributors-)
 
@@ -297,6 +298,50 @@ jobs:
                   environment: orion
                   onlyRemoveDeployments: true
                   delay: "500"
+```
+
+<br />
+
+### Limit Deployments Removed
+You may specify a custom value to represent how many deployments you want to remove from your deployment history. The default value is `100` which is the max that is allowed by the Github REST API. The following example will delete **43** deployments from your history:
+
+```yml
+jobs:
+    cleanup:
+        runs-on: ubuntu-latest
+        permissions: write-all
+
+        steps:
+            - name: >-
+                ⚙️ Deployments › Clean
+              uses: Aetherinox/delete-deploy-env-action@v3.0.0
+              with:
+                  token: ${{ secrets.SELF_TOKEN_CL }}
+                  environment: orion
+                  onlyRemoveDeployments: true
+                  limit: 43
+```
+
+<br />
+
+If you wish to delete more than the `100` max limit, you must combine the property `limit` with `delay`. The example below will delete `165 deployments`, but with a delay of `500 milliseconds` between each deployment removed from your history.
+
+```yml
+jobs:
+    cleanup:
+        runs-on: ubuntu-latest
+        permissions: write-all
+
+        steps:
+            - name: >-
+                ⚙️ Deployments › Clean
+              uses: Aetherinox/delete-deploy-env-action@v3.0.0
+              with:
+                  token: ${{ secrets.SELF_TOKEN_CL }}
+                  environment: orion
+                  onlyRemoveDeployments: true
+                  delay: 500
+                  limit: 165
 ```
 
 <br />
