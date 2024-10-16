@@ -513,7 +513,7 @@ Want to help but can't write code?
 
 <br />
 
-![Alt](https://repobeats.axiom.co/api/embed/affb6023065a4021a21bb3bcc958eb77765ff0ea.svg "Repobeats analytics image")
+![Alt](https://repobeats.axiom.co/api/embed/affb6023065a4021a21bb3bcc958eb77765ff0ea.svg "Analytics image")
 
 <br />
 
