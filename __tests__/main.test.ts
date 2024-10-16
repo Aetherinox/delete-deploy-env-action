@@ -258,7 +258,7 @@ test.serial(' Should successfully remove deployments and not remove environment'
         t.is(deployments.length, 0);
 
         // delete all artifacts
-        console.log(`Clean up remaining trash & artifacts`)
+        console.log(` › 🗑️ Clean up remaining trash & artifacts`)
         delete process.env.INPUT_ONLYREMOVEDEPLOYMENTS;
         delete process.env.INPUT_LIMIT;
         await main();
@@ -323,7 +323,7 @@ test.serial( ' Successfully remove deployment ref only and not remove environmen
         await main();
 
         // delete all artifacts
-        console.log(`Clean up remaining trash & artifacts`)
+        console.log(` › 🗑️ Clean up remaining trash & artifacts`)
         delete process.env.INPUT_ONLYREMOVEDEPLOYMENTS;
         delete process.env.INPUT_LIMIT;
         await main();
@@ -355,9 +355,10 @@ test.serial( ' Successfully remove multiple deployments only and not remove envi
             Create multiple deployments within the environment to test removing them all.
         */
 
+        console.log(`\n`)
         for (let i = 1; i <= deployAmt; i++) {
             await createDeploymentWithStatus(octokit, environment, { ...context, ref });
-            console.log(`Creating deployment for multitest - ref ${ref}`)
+            console.log(` › ➕ Create test deployment for multitest › \x1b[38;5;13mref ${ref}\x1b[0m`)
             await delay(delayAmt);
         }
 
@@ -412,7 +413,7 @@ test.serial( ' Successfully remove multiple deployments only and not remove envi
         await main();
 
         // delete all artifacts
-        console.log(`Clean up remaining trash & artifacts`)
+        console.log(` › 🗑️ Clean up remaining trash & artifacts`)
         delete process.env.INPUT_ONLYREMOVEDEPLOYMENTS;
         delete process.env.INPUT_LIMIT;
         await main();
@@ -448,9 +449,10 @@ test.serial( ' Successfully deleted limited results',
             Create multiple deployments within the environment to test removing them a certain number.
         */
 
+        console.log(`\n`)
         for (let i = 1; i <= deployAmt; i++) {
             await createDeploymentWithStatus(octokit, environment, { ...context, ref });
-            console.log(`Creating deployment for multitest - ref ${ref}`)
+            console.log(` › ➕ Create test deployment for multitest › \x1b[38;5;13mref ${ref}\x1b[0m`)
             await delay(delayAmt);
         }
 
@@ -490,8 +492,6 @@ test.serial( ' Successfully deleted limited results',
 
             deploymentStatus = res.status === 200;
             deployments = await getDeployments(octokit, environment, context);
-
-            console.log(deployments)
         }
         catch (err)
         {
@@ -512,7 +512,7 @@ test.serial( ' Successfully deleted limited results',
         */
 
         // delete all artifacts
-        console.log(`Clean up remaining trash & artifacts`)
+        console.log(` › 🗑️ Clean up remaining trash & artifacts`)
         delete process.env.INPUT_ONLYREMOVEDEPLOYMENTS;
         delete process.env.INPUT_LIMIT;
         await main();
