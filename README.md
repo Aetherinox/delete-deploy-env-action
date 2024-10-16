@@ -6,7 +6,7 @@
 
 <p>
 
-A github action which allows you to delete deployments and environments.
+This github action allows you to delete environments, as well as delete your deployment history. Deployments can be deleted in their totality, or you can target a specific number of deployments to erase.
 
 </p>
 
@@ -18,6 +18,7 @@ A github action which allows you to delete deployments and environments.
 <div align="center">
 
 <!-- prettier-ignore-start -->
+[![Tests][github-tests-img]][github-tests-img]
 [![Version][github-version-img]][github-version-uri]
 [![Downloads][github-downloads-img]][github-downloads-uri]
 [![Size][github-size-img]][github-size-img]
@@ -58,25 +59,37 @@ A github action which allows you to delete deployments and environments.
 
 ## About
 
-GitHub action that will find and delete all deployments by deployment name as well as the GitHub environment
-they are deployed to. It will first find and mark all deployments as `inactive` and then delete all deployments and then the environment.
+GitHub action which finds and deletes all deployments by deployment name as well as the GitHub environment
+they are deployed to. Action  will find and mark all deployments as `inactive` and then delete all deployments and then finally the environment itself.
 
 - To only delete deployments and the not environment, add `onlyRemoveDeployments: true`.
 - To keep deployments but inactivate all deployments, add `onlyDeactivateDeployments: true`
 - To only delete a deployment ref and not all deployments of a given environment, add `ref: my-branch`
+- To circumvent the error `You have exceeded a secondary rate limit`, add `delay: 500` or some value that doesn't surpass 100 actions per minute.
+- To remove a limited number of deployments lesser than the default `100`, add `limit: 50` or any other value to target a specific number.
 
-Note if you pass `onlyDeactivateDeployments: true` and `onlyRemoveDeployments: true`, `onlyRemoveDeployments` will override
+<br />
+
+> [!NOTE]
+> If you pass `onlyDeactivateDeployments: true` and `onlyRemoveDeployments: true` together, `onlyRemoveDeployments` will override
 `onlyDeactivateDeployments` and all deployments will be removed.
 
-Also note that if you are planning on deleting a created environment, your `GITHUB_TOKEN` must have permissions with repo scope. The token provided by the workflow, `github.token` does not have the permissions to delete created environments. _(See [Delete an environment REST API docs](https://docs.github.com/en/rest/reference/repos#delete-an-environment))_
+<br />
 
-If you see a `Resource not accessible by integration` error, you'll likely need to follow the instructions below to obtain the proper token.
+> [!NOTE]
+> If you plan to delete a created environment, your `GITHUB_TOKEN` MUST have permissions with `repo` scope. The token provided by the workflow, `github.token` does not have the permissions to delete created environments. 
+> 
+> _(See [Delete an environment REST API docs](https://docs.github.com/en/rest/reference/repos#delete-an-environment))_
+
+<br />
+
+> [!NOTE]
+> If you see the error `Resource not accessible by integration`, you'll need to follow the instructions below to obtain the proper token.
 
 <br />
 
 ### Obtain A Token
-
-For certain operations _(like deleting an environment)_, your GitHub Action will need additional permissions that your `github.token` simply doesn't have.
+For certain operations _(like deleting an environment)_, your GitHub Action will need additional permissions that the default `github.token` simply doesn't have.
 
 <br />
 
@@ -84,10 +97,12 @@ In this case, a [GitHub App](https://docs.github.com/en/developers/apps/getting-
 
 <br />
 
-1. [Create a GitHub app](https://docs.github.com/en/developers/apps/building-github-apps/creating-a-github-app).
-2. [Generate a Private Key](https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#generating-a-private-key)
-3. Add your GitHub App's "App ID" to your repo's [Actions Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) _(ex: `GH_APP_ID`)_
-4. Add your Private Key to your repo's [Actions Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) _(ex: `GH_APP_PRIVATE_KEY`)_
+1. [Create GitHub app](https://docs.github.com/en/developers/apps/building-github-apps/creating-a-github-app)
+2. [Generate Private Key](https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#generating-a-private-key)
+3. Add your GitHub App's "App ID" to your repo's [Actions Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+    - _(ex: `GH_APP_ID`)_
+4. Add your Private Key to your repo's [Actions Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+    - _(ex: `GH_APP_PRIVATE_KEY`)_
 5. Use [navikt/github-app-token-generator](https://github.com/navikt/github-app-token-generator) before using this action to generate a JWT
 
    <br />
@@ -97,9 +112,10 @@ In this case, a [GitHub App](https://docs.github.com/en/developers/apps/getting-
    `cleanup-pr.yml`
 
    ```yml
-   #
-   # Cleans up a GitHub PR
-   #
+   # #
+   #    Cleans up a GitHub PR
+   # #
+
    name: 🧼 Clean up environment
    on:
    pull_request:
@@ -515,11 +531,11 @@ The following people have helped get this project going:
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 <table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top"><a href="https://gitlab.com/Aetherinox"><img src="https://avatars.githubusercontent.com/u/118329232?v=4?s=40" width="80px;" alt="Aetherinox"/><br /><sub><b>Aetherinox</b></sub></a><br /><a href="https://github.com/Aetherinox/delete-deploy-env-action/commits?author=Aetherinox" title="Code">💻</a> <a href="#projectManagement-Aetherinox" title="Project Management">📆</a> <a href="#fundingFinding-Aetherinox" title="Funding Finding">🔍</a></td>
-    </tr>
-  </tbody>
+    <tbody>
+        <tr>
+            <td align="center" valign="top"><a href="https://gitlab.com/Aetherinox"><img src="https://avatars.githubusercontent.com/u/118329232?v=4?s=40" width="80px;" alt="Aetherinox"/><br /><sub><b>Aetherinox</b></sub></a><br /><a href="https://github.com/Aetherinox/delete-deploy-env-action/commits?author=Aetherinox" title="Code">💻</a> <a href="#projectManagement-Aetherinox" title="Project Management">📆</a> <a href="#fundingFinding-Aetherinox" title="Funding Finding">🔍</a></td>
+        </tr>
+    </tbody>
 </table>
 </div>
 <!-- markdownlint-restore -->
@@ -586,8 +602,8 @@ The following people have helped get this project going:
   [github-build-pypi-uri]: https://github.com/Aetherinox/delete-deploy-env-action/actions/workflows/pypi-release.yml
 
 <!-- BADGE > GITHUB > TESTS -->
-  [github-tests-img]: https://img.shields.io/github/actions/workflow/status/Aetherinox/delete-deploy-env-action/npm-tests.yml?logo=github&label=Tests&color=2c6488
-  [github-tests-uri]: https://github.com/Aetherinox/delete-deploy-env-action/actions/workflows/npm-tests.yml
+  [github-tests-img]: https://img.shields.io/github/actions/workflow/status/Aetherinox/delete-deploy-env-action/ci-tests.yml?logo=github&label=Tests&color=2c6488
+  [github-tests-uri]: https://github.com/Aetherinox/delete-deploy-env-action/actions/workflows/ci-tests.yml
 
 <!-- BADGE > GITHUB > COMMIT -->
   [github-commit-img]: https://img.shields.io/github/last-commit/Aetherinox/delete-deploy-env-action?logo=conventionalcommits&logoColor=FFFFFF&label=Last%20Commit&color=313131
