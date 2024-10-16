@@ -46,7 +46,7 @@ async function listDeployments( client: Octokit, { owner, repo, environment, ref
     const itemsTotal = deploymentRefs.length
 
     if ( !limit || limit === 100 )
-{
+    {
         info( `      › ⚙️ Using default limit of \x1b[38;5;1m${ limit }\x1b[0m` )
         if ( itemsTotal === 100 )
             return deploymentRefs.concat( await listDeployments( client, { owner, repo, environment, ref, limit }, page + 1 ) )
@@ -56,8 +56,8 @@ async function listDeployments( client: Octokit, { owner, repo, environment, ref
     */
 
     }
- else if ( limit >= 100 )
-{
+    else if ( limit >= 100 )
+    {
         const pagesNeeded = Math.ceil( limit / 100 )
 
         /*
@@ -66,10 +66,14 @@ async function listDeployments( client: Octokit, { owner, repo, environment, ref
         */
 
         if ( itemsTotal < limit && page < pagesNeeded )
-{
+        {
             info( `      › ⚙️ Using custom limit of \x1b[38;5;1m${ limit }\x1b[0m › reading page \x1b[38;5;32mpage ${ page }/${ pagesNeeded }\x1b[0m` )
             return deploymentRefs.concat( await listDeployments( client, { owner, repo, environment, ref, limit }, page + 1 ) )
         }
+    }
+    else if ( limit !== 100 )
+    {
+        info( `      › ⚙️ Using custom limit of \x1b[38;5;1m${ limit }\x1b[0m › not using pagination` )
     }
 
     /*
@@ -87,7 +91,7 @@ async function listDeployments( client: Octokit, { owner, repo, environment, ref
 
 async function setDeploymentInactive( client: Octokit, { owner, repo, deploymentId }: Deployment ): Promise < void >
 {
-    info( `      › ✔️ ID \x1b[38;5;8m${ deploymentId }\x1b[0m inactive` )
+    info( `      › ✔️ ID \x1b[38;5;244m${ deploymentId }\x1b[0m inactive` )
     await client.request( 'POST /repos/{owner}/{repo}/deployments/{deployment_id}/statuses',
     {
         owner,
@@ -103,7 +107,7 @@ async function setDeploymentInactive( client: Octokit, { owner, repo, deployment
 
 async function deleteDeploymentById( client: Octokit, { owner, repo, deploymentId }: Deployment ): Promise < void >
 {
-    info( `      › ✔️ ID \x1b[38;5;8m${ deploymentId }\x1b[0m deleted` )
+    info( `      › ✔️ ID \x1b[38;5;244m${ deploymentId }\x1b[0m deleted` )
     await client.request( 'DELETE /repos/{owner}/{repo}/deployments/{deployment_id}',
     {
         owner,

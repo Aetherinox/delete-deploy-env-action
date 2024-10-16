@@ -361,7 +361,7 @@ test.serial( ' Successfully remove multiple deployments only and not remove envi
 
         console.log( `\n` )
         for ( let i = 1; i <= deployAmt; i++ )
-{
+        {
             await createDeploymentWithStatus( octokit, environment, { ...context, ref } )
             console.log( ` › ➕ Create test deployment for multitest › \x1b[38;5;13mref ${ ref }\x1b[0m` )
             await delay( delayAmt )
@@ -456,7 +456,7 @@ test.serial( ' Successfully deleted limited results',
 
         console.log( `\n` )
         for ( let i = 1; i <= deployAmt; i++ )
-{
+        {
             await createDeploymentWithStatus( octokit, environment, { ...context, ref } )
             console.log( ` › ➕ Create test deployment for multitest › \x1b[38;5;13mref ${ ref }\x1b[0m` )
             await delay( delayAmt )
