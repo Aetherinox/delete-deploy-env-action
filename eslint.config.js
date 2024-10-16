@@ -7,7 +7,7 @@ const prettier = require('eslint-plugin-prettier');
 const stylisticJs = require('@stylistic/eslint-plugin-js');
 const stylisticTs = require('@stylistic/eslint-plugin-ts');
 const stylisticPlus = require('@stylistic/eslint-plugin-plus')
-const github = require('eslint-plugin-github')
+// const github = require('eslint-plugin-github')
 
 module.exports = [
 {
@@ -19,8 +19,7 @@ module.exports = [
         'prettier': prettier,
         '@stylistic/js': stylisticJs,
         '@stylistic/ts': stylisticTs,
-        '@stylistic/plus': stylisticPlus,
-        'github': github
+        '@stylistic/plus': stylisticPlus
     },
     languageOptions: {
         parser: tsParser,
