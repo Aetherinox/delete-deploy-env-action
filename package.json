@@ -78,7 +78,7 @@
       "ava": "^4.3.3",
       "eslint": "^8.56.0",
       "eslint-config-prettier": "^9.1.0",
-      "eslint-config-love": "^81.0.0",
+      "eslint-config-love": "^84.1.1",
       "eslint-plugin-escompat": "^3.4.0",
       "eslint-plugin-github": "^4.10.1",
       "eslint-plugin-prettier": "^5.1.3",
