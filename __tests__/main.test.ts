@@ -287,7 +287,7 @@ test.serial( ' Successfully remove deployment ref only and not remove environmen
         await createDeploymentWithStatus( octokit, environment, { ...context, ref } )
 
         // make sure this branch exists to create another deployment
-        const newRef = 'release/v3'
+        const newRef = 'v3'
         await createDeploymentWithStatus( octokit, environment, { ...context, ref: newRef } )
 
         process.env.INPUT_ENVIRONMENT = environment
@@ -347,7 +347,7 @@ test.serial( ' Successfully remove multiple deployments only and not remove envi
 
         const deployAmt = 10                   // number of deployments to create
         const delayAmt = 500                   // delay between each deployment removed
-        const newRef = 'release/v3'
+        const newRef = 'v3'
         const environment = 'test-remove-deployment-ref-only'
 
         const { octokit, repo, ref } = t.context
