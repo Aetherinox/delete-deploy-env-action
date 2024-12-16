@@ -161,7 +161,7 @@ gh repo fork REPOSITORY --org "octo-org"
 <br />
 
 ### Running Unit Tests
-You must create a `release/v3` branch created in order for some of the unit tests to work.
+You must create a `v3` branch created in order for some of the unit tests to work.
 
 <br />
 
