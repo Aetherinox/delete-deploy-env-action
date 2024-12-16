@@ -6,8 +6,8 @@
 #   @url                https://github.com/Aetherinox
 # #
 
-name: "🏷️ Release › Create @latest Tag"
-run-name: "🏷️ Release › Create @latest Tag"
+name: "📦 Release › Create @latest Tag"
+run-name: "📦 Release › Create @latest Tag"
 
 # #
 #   Triggers
