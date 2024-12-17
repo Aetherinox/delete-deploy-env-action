@@ -205,7 +205,7 @@ jobs:
             - name: "🪪 Generate IDs"
               id: task_release_npm_env_generate
               run: |
-                  npm run init:generate
+                  npm run root:generate
 
             # #
             #   .ENV › Get
