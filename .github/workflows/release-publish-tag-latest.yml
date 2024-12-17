@@ -1,6 +1,42 @@
 # #
 #   @type               github workflow
-#   @desc               grabs the latest version of your github release, and creates an additional tag called @latest
+#   @desc               when making your own Github workflow, you must create two new releases.
+#                         1. the version released
+#                         2. one with the 'latest' tag
+#
+#                       this allows a user to use your workflow in a github yml file using either the version tag
+#                       or by using the latest tag.
+#
+#                       this workflow is triggered when you run the first workflow `release-publish.yml`.
+#                       this workflow runs after the first workflow has completed releasing the version tag v3.x.x,
+#                       and then this workflow will create a release with the tag 'latest' in your repo's 'Releases'
+#                       page on Github
+#
+#                       -------[ USING VERSION TAG ]-------------------------------------------------------------------
+#
+#                       jobs:
+#                           cleanup:
+#                               runs-on: ubuntu-latest
+#                               permissions: write-all
+#                       
+#                               steps:
+#                                   - name: >-
+#                                       ⚙️ Deployments › Clean
+#                                   uses: Aetherinox/delete-deploy-env-action@v3.0.0
+#                                   with:
+#                                       token: ${{ secrets.SELF_TOKEN_CL }}
+#                                       environment: orion
+#                                       onlyRemoveDeployments: true
+#                                       delay: "1000"
+#
+#                       -------[[ USING LATEST TAG ]--------------------------------------------------------------------
+#
+#                               steps:
+#                                   - name: >-
+#                                       ⚙️ Deployments › Clean
+#                                   uses: Aetherinox/delete-deploy-env-action@latest
+#
+#                       grabs the latest version of your github release, and creates an additional tag called @latest
 #                       useful for projects that involve creating github workflows that others can use.
 #   @author             Aetherinox
 #   @url                https://github.com/Aetherinox
