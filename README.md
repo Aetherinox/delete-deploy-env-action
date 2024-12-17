@@ -48,6 +48,9 @@ This github action allows you to delete environments, as well as delete your dep
   - [Avoid Secondary Rate Limiting](#avoid-secondary-rate-limiting)
   - [Limit Deployments Removed](#limit-deployments-removed)
 - [Rate Limits](#rate-limits)
+- [Build \& Release](#build--release)
+  - [Install](#install)
+  - [New Github Release](#new-github-release)
 - [Contributors ✨](#contributors-)
 
 
@@ -492,7 +495,65 @@ X-RateLimit-Resource: core
 
 <br />
 
+<br />
 
+---
+
+<br />
+
+## Build & Release
+To build a new copy of this workflow for development:
+
+<br />
+
+### Install
+
+```shell
+npm install
+```
+
+<br />
+
+### New Github Release
+To push a new release, first run eslint locally to check for issues
+```shell
+npm run lint
+```
+
+<br />
+
+Then open the `package.json` and bump the version. Then push the updated `package.json` file to the repo:
+```json
+{
+    "name": "delete-deployment-environment",
+    "version": "3.0.1",
+}
+```
+
+<br />
+
+Run the workflow `release-publish.yml` from https://github.com/Aetherinox/delete-deploy-env-action/actions.
+
+<br />
+
+Once you run the publish workflow, a second workflow will be ran: `.github\workflows\release-publish-tag-latest.yml`. This will create an additional new release with the tag `latest` so that you can use the workflow in your .yml file under the `latest` tag:
+
+```yml
+jobs:
+    cleanup:
+        runs-on: ubuntu-latest
+        permissions: write-all
+  
+        steps:
+            - name: >-
+                ⚙️ Deployments › Clean
+              uses: Aetherinox/delete-deploy-env-action@latest
+              with:
+                  token: ${{ secrets.SELF_TOKEN_CL }}
+                  environment: orion
+                  onlyRemoveDeployments: true
+                  delay: "1000"
+```
 
 <br />
 
