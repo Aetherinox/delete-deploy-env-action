@@ -184,10 +184,10 @@ jobs:
             #   Release › Print / Lint
             # #
 
-            - name: "🪪 NPM › Pretty"
+            - name: "🪪 NPM › Lint"
               id: task_release_npm_prettylint
               run: |
-                  npm run pretty
+                  npm run lint
 
             # #
             #   Release › Build
@@ -508,6 +508,7 @@ jobs:
         name: >-
           🆗 Successful Deployment
         runs-on: ubuntu-latest
+        needs: [ job-initialize, job-release ]
         steps:
 
             # #
