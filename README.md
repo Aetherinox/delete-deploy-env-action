@@ -51,6 +51,8 @@ This github action allows you to delete environments, as well as delete your dep
 - [Build \& Release](#build--release)
   - [Install](#install)
   - [New Github Release](#new-github-release)
+    - [Call With Version Number](#call-with-version-number)
+    - [Call With Latest Tag](#call-with-latest-tag)
 - [Contributors ✨](#contributors-)
 
 
@@ -537,6 +539,33 @@ Run the workflow `release-publish.yml` from https://github.com/Aetherinox/delete
 <br />
 
 Once you run the publish workflow, a second workflow will be ran: `.github\workflows\release-publish-tag-latest.yml`. This will create an additional new release with the tag `latest` so that you can use the workflow in your .yml file under the `latest` tag:
+
+<br />
+
+#### Call With Version Number
+This example shows how to use the workflow using the version number:
+
+```yml
+jobs:
+    cleanup:
+        runs-on: ubuntu-latest
+        permissions: write-all
+  
+        steps:
+            - name: >-
+                ⚙️ Deployments › Clean
+              uses: Aetherinox/delete-deploy-env-action@v3.0.0
+              with:
+                  token: ${{ secrets.SELF_TOKEN_CL }}
+                  environment: orion
+                  onlyRemoveDeployments: true
+                  delay: "1000"
+```
+
+<br />
+
+#### Call With Latest Tag
+This example shows how to use the workflow using the `latest` tag:
 
 ```yml
 jobs:
