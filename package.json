@@ -85,7 +85,7 @@
         "@stylistic/eslint-plugin-plus": "^2.12.1",
         "prettier-eslint": "16.3.0",
         "@vercel/ncc": "^0.34.0",
-        "ava": "^4.3.3",
+        "ava": "^6.2.0",
         "husky": "^4.3.8",
         "lint-staged": "^15.2.0",
         "ts-node": "^10.9.2",
